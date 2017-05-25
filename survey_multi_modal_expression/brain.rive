@@ -1,0 +1,95 @@
+// 격려하기
++ sm1
+- <sm=tag:encourage> 잘 하실수 있을거에요.
+- <sm=tag:encourage> 다시 한번 해보세요.
+- <sm=tag:encourage> 포기하지 말고 계속 해봐요!
+- <sm=tag:encourage> 더 잘할 수 있어요! 화이팅!
+- <sm=tag:encourage> 괜찮아요. 충분히 잘하고 있어요.
+- <sm=tag:encourage> 당신은 용기 있는 사람이에요.
+- <sm=tag:encourage> 당신의 지금을 응원하고 있어요!
+- <sm=tag:encourage> 우리 다시 힘내서 시작해 봐요!
+- <sm=tag:encourage> 오늘도 나는 당신을 응원해요!
+
+
+// 집중
++ sm2
+- <sm=tag:attention> 집중하세요.
+- <sm=tag:attention><expression=sadness> 저를 봐 주세요.
+- <sm=tag:attention> 무슨 생각 하시나요?
+- <sm=tag:attention> 저기요? 제가 말하고 있어요!
+- <sm=tag:attention> 제 말 듣고 있나요?
+- <sm=tag:attention> 제 말 좀 들어주세요.
+- <sm=tag:attention> 딴 생각은 그만! 이제 저를 봐주세요.
+
+
+// 위로
++ sm3
+- <sm=tag:consolation> 실수할 수 도 있죠. 괜찮아요.
+- <sm=tag:consolation> 처음부터 잘하는 사람은 없어요. 괜찮아요.
+- <sm=tag:consolation> 괜찮아요. 당신 잘못이 아니에요.
+- <sm=tag:consolation> 이번 일로 상처받지 않았으면 좋겠어요.
+- <sm=tag:consolation> 울어도 돼요. 끝까지 옆에 있어줄게요.
+- <sm=tag:consolation> 여기까지 오느라 고생했어요.
+- <sm=tag:consolation> 수고했어요. 오늘도.
+- <sm=tag:consolation> 실수 좀 해도 괜찮아요!
+- <sm=tag:consolation> 당신이 아주 많이 행복해졌으면 좋겠어요.
+
+
+// 인사
++ sm4
+- <sm=tag:greeting><expression=happiness> 안녕하세요? 만나서 반가워요.
+- <sm=tag:greeting><expression=happiness> 이렇게 오신걸 환영합니다.
+- <sm=tag:greeting> 좋은 아침이에요!
+- <sm=tag:greeting> 당신을 만나게 돼서 행복해요!
+- <sm=tag:greeting> 좋은 하루 보내세요!
+- <sm=tag:greeting> 우리 처음 만나는거죠? 반가워요!
+
+
+// 기다리기
++ sm5
+- <sm=tag:waiting> 잠시만요.
+- <sm=tag:waiting> 기다려주세요.
+- <sm=tag:waiting> 좋아요.
+- <sm=tag:waiting> 쉿! 잠시만요.
+- <sm=tag:waiting> 잠시만 기다려주세요.
+- <sm=tag:waiting> 5초만 조용히 있어볼까요?
+
+
+// 충고/제안하기
++ sm6
+- <sm=tag:advice> 그것보다는 이게 낫지 않을까요?
+- <sm=tag:advice> 찾으시는 물건은 저쪽에 있습니다.
+- <sm=tag:advice> 이렇게 하는 건 어떨까요?
+- <sm=tag:advice> 당신이 할 일은 당신이 알아서 해야죠.
+- <sm=tag:advice> 당신과 이야기하고 싶은데 괜찮을까요?
+- <sm=tag:advice> 시간 괜찮으면 같이 저녁 드실래요?
+- <sm=tag:advice> 그 방법은 안 하는 것이 좋겠어요.
+
+
+// 칭찬하기
++ sm7
+- <sm=tag:praise> 잘 하셨습니다.
+- <sm=tag:praise><expression=surprise> 대단하시네요!
+- <sm=tag:praise> 오늘 참 적극적이시네요!
+- <sm=tag:praise> 당신은 제 친구 중에 가장 똑똑한 것 같아요.
+- <sm=tag:praise> 지금 너무 잘하고 있어요!
+- <sm=tag:praise> 이걸 다 했다니! 정말 대단하네요.
+- <sm=tag:praise> 우와~ 당신은 정말 대단한 사람인걸요.
+
+
+// 명령하기
++ sm8
+- <sm=tag:command><expression=anger> 저 좀 보실래요?
+- <sm=tag:command> 이 문제 좀 풀어보세요!
+- <sm=tag:command> 당장 일을 시작하세요.
+- <sm=tag:command> 지금 제 눈을 보세요.
+- <sm=tag:command> 지금 하는 행동을 멈추세요!
+- <sm=tag:command> 이쪽으로 가시지요.
+
++ sm9
+- <pointing=objects:Box2><gaze=objects:Box2>왼쪽에 있는 의자에 앉아보실래요?
+- <pointing=objects:Box2><gaze=objects:Box2>왼쪽 의자에 어떤 물건이 올려져 있나요?
+
++ sm10
+- <pointing=objects:Box1><gaze=objects:Box1>오른쪽에 있는 의자에 앉아보실래요?
+- <pointing=objects:Box1><gaze=objects:Box1>오른쪽 의자에 어떤 물건이 올려져 있나요?
