@@ -6,164 +6,165 @@
 - 피부에 대한 상태를 말씀해 주시면 자세히 상담해 드리겠습니다.{topic=t_scenariostart}
 
 > topic t_scenariostart
-	+ e:person-appeared
-	- {topic=greeting}{@start}
+    + e:person-appeared
+    - {topic=greeting}{@start}
 < topic
 
 > topic greeting
-	+ start
-	- <sm=tag:greeting[happiness]> 우리 인사부터 할까요? 만나서 반갑습니다.....  저는 스킨케어로봇입니다........
+    + start
+    - <sm=tag:greeting[happiness]> 우리 인사부터 할까요? 만나서 반갑습니다.....  저는 스킨케어로봇입니다........
 
-	+ e:face-recognized
-	- <set name=<mget face_recognition/name[face_id=<get face_id>]>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
+    + e:face-recognized
+    - <set name=<mget face_recognition/name[face_id=<get face_id>]>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
 < topic
 
 > topic greeting2
-	+ start
-	* <get name> == undefined => 저는 기억이 없는데,... 이름을 물어봐도 될까요?.........{topic=getname}
-	* <get name> != undefined => <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다.{topic=t_personal1}{@start}
+    + start
+    * <get name> == undefined => 저는 기억이 없는데,... 이름을 물어봐도 될까요?.........{topic=getname}
+    * <get name> != undefined => <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다.{topic=t_personal1}{@start}
 < topic
 
 > topic getname
-	+ 내 이름은 *
-	- <set name1=<star>> <star>님 반갑습니다. 다음 번에 방문하시면 제가 먼저 인사드릴께요.  {topic=t_personal}{@start}
+    + 내 이름은 *
+    - <set name1=<star>> <star>님 반갑습니다. 다음 번에 방문하시면 제가 먼저 인사드릴께요.  {topic=t_personal}{@start}
 
-	+ 내이름은 *
-	- <set name1=<star>> <star>님 반갑습니다. 기억하겠습니다.  {topic=t_personal}{@start}
+    + 내이름은 *
+    - <set name1=<star>> <star>님 반갑습니다. 기억하겠습니다.  {topic=t_personal}{@start}
 
-	+ 나는 *라고 해
-	- <set name1=<star>> <star>님 반갑습니다. 기억할께요.  {topic=t_personal}{@start} 
+    + 나는 *라고 해
+    - <set name1=<star>> <star>님 반갑습니다. 기억할께요.  {topic=t_personal}{@start}
 
 < topic
 
-> topic t_personal 
-	+ start
-	- 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name1>님의 외형을 좀 살펴 볼께요...........{topic=t_personal_d}{@start}
+> topic t_personal
+    + start
+    - 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name1>님의 외형을 좀 살펴 볼께요...........{topic=t_personal_d}{@start}
 < topic
 
 > topic t_personal_d
-	+ start
-	- 저를 잠시 보세요..........
+    + start
+    - 저를 잠시 보세요..........
 
-	+ e:face-detected
+    + e:face-detected
    	* <mget person_identification/hair_style[face_id=<get face_id>]> == long => 긴 머리가 아주 잘어울려요. {@next}
    	* <mget person_identification/hair_style[face_id=<get face_id>]> == short => 시원하게 짧은 머리가 아주 잘어울려요.{@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == red => 빨간옷이 따뜻해 보이네요.{@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == blue => 파란색옷이 잘 어울리네요.{@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == green => 녹색옷이 상큼해 보이네요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == black => 검정색 옷이 차분해 보이네요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == purple => 보라색옷이 아주 멋있어 보여요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == brown => 갈색옷이 아주 멋있어 보여요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == grey => 회색 옷이 아주 멋있어 보여요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == orange => 오렌지색 옷이 아주 멋있어 보여요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == pink => 핑크색 옷이 아주 멋있어 보여요. {@next}	
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == white => 흰 옷이 아주 멋있어 보여요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
-	* <mget person_identification/cloth_color[face_id=<get face_id>]> == '' => 좀 더 가까이 와 주세요....{@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == red => 빨간옷이 따뜻해 보이네요.{@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == blue => 파란색옷이 잘 어울리네요.{@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == green => 녹색옷이 상큼해 보이네요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == black => 검정색 옷이 차분해 보이네요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == purple => 보라색옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == brown => 갈색옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == grey => 회색 옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == orange => 오렌지색 옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == pink => 핑크색 옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == white => 흰 옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
+    * <mget person_identification/cloth_color[face_id=<get face_id>]> == '' => 좀 더 가까이 와 주세요....{@next}
 
-	+ next
-	- {topic=t_start}{@start} 
+    + next
+    - {topic=t_start}{@start}
 < topic
 
 > topic t_start
-	+ start
-	- 고객님의 정보를 확인해 보겠습니다.{topic=t_genom_explain}{@start} 
+    + start
+    - 고객님의 정보를 확인해 보겠습니다.{topic=t_genom_explain}{@start}
 < topic
 
 > topic t_genom_explain
-	+ start
-	- <sm=tag:attention[happiness]>자! 여기를 보시고 제가 하는 말을 잘 들어보세요.
-	^ <call>mget skincare_data/id</call> 어디 보자.... //genom db, mget으로 id를 가져옴
-	^ 고객님의 유전자 정보를 살펴 보니 유전적으로 멜라닌 세포가 활성화 되어 있고…. {topic=t_skin_state}
-	- 전반적으로 고객님의 피부는 비타민C를 흡수하는 능력이 약하시네요.{topic=t_skin_state}
+    + start
+    - <sm=tag:attention[happiness]>자! 여기를 보시고 제가 하는 말을 잘 들어보세요.
+    ^ <call>mget skincare_data/id</call> 어디 보자.... //genom db, mget으로 id를 가져옴
+    ^ 고객님의 유전자 정보를 살펴 보니 유전적으로 멜라닌 세포가 활성화 되어 있고…. {topic=t_skin_state}
+    - 전반적으로 고객님의 피부는 비타민C를 흡수하는 능력이 약하시네요.{topic=t_skin_state}
 < topic
 
-> topic t_skin_state 
-	+ <get name>님의 피부는 건성 인가요?
-	- <gaze=person:<get name>> 어디 보자, 건성 인가? 지성인가?{topic=t_answer}{@start}
+> topic t_skin_state
+    + <get name>님의 피부는 건성 인가요?
+    - <gaze=person:<get name>> 어디 보자, 건성 인가? 지성인가?{topic=t_answer}{@start}
 < topic
 
 > topic t_answer
-	+ start
-	- <get name>님, 제 질문에 긍정 또는 부정의 표현을 해주시면 됩니다. 
-	
-	+ (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네) 
-	- 잘 알겠어요. <call>mset skin_state/skin_res:건성,user_id:11<call> //mset skin_state
-	^ 고객님께서 원하는 가격대가 어느 정도 인가요? {topic=t_price}{@start}
+    + start
+    - <get name>님, 제 질문에 긍정 또는 부정의 표현을 해주시면 됩니다.
 
-	+ (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요|틀렸어|틀려) 
-	- 그 참, 소중한 피부에 관심이 없으시다니, 제가 제품 추천 해 드릴테니 한번 사용해 보세요. {topic=t_rec_items}{@start}
+    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
+    - 잘 알겠어요. <call>mset skin_state/skin_res:건성,user_id:11<call> //mset skin_state
+    ^ 고객님께서 원하는 가격대가 어느 정도 인가요? {topic=t_price}{@start}
 
-	+ e:turn-release-detected
-	- <get name1>님, 생각을 너무 오래 하시네요.{topic=t_answer}{@start}
+    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요|틀렸어|틀려)
+    - 그 참, 소중한 피부에 관심이 없으시다니, 제가 제품 추천 해 드릴테니 한번 사용해 보세요. {topic=t_rec_items}{@start}
+
+    + e:turn-release-detected
+    - <get name1>님, 생각을 너무 오래 하시네요.{topic=t_answer}{@start}
 
 < topic
 
-> topic t_price 
-	+ <get name>님, 가격대가 좀 높지만 효과가 좋은 제품을 원하시나요?
-	- <e:person_disengaged> 고객님, 저 좀 보세요. 고가의 제품을 쓰실 거 같은데 그렇죠? {topic=t_answer1}{@start}
+> topic t_price
+    + <get name>님, 가격대가 좀 높지만 효과가 좋은 제품을 원하시나요?
+    - <e:person_disengaged> 고객님, 저 좀 보세요. 고가의 제품을 쓰실 거 같은데 그렇죠? {topic=t_answer1}{@start}
 < topic
 
 > topic t_answer1
-	+ start
-	- <get name>님, 맞으면 긍정의 표현을 해주시고 싫으시면 부정의 표현을 해 주세요.
+    + start
+    - <get name>님, 맞으면 긍정의 표현을 해주시고 싫으시면 부정의 표현을 해 주세요.
 
-	+ (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-	- 잘 알겠어요. <call>mset price/price_level:1,user_id:11<call> 
-	^ 고객님께 적당한 제품을 추천해 드릴테니 잠시만 기다려주세요. {topic=t_rec_items}{@start} //memset data
+    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
+    - 잘 알겠어요. <call>mset price/price_level:1,user_id:11<call>
+    ^ 고객님께 적당한 제품을 추천해 드릴테니 잠시만 기다려주세요. {topic=t_rec_items}{@start} //memset data
 
-	+ (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
-	- 가격은 별로 중요하지 않으시군요. 제가 <get name>님께 적당한 제품을 추천해드릴께요. 한번 이용해 보세요. {topic=t_rec_items}{@start}
+    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
+    - 가격은 별로 중요하지 않으시군요. 제가 <get name>님께 적당한 제품을 추천해드릴께요. 한번 이용해 보세요. {topic=t_rec_items}{@start}
 
-	+ e:turn-release-detected
-	- <get name1>님, 답변을 해 주셔야 제가 <get name>님께 가장 잘 맞는 제품을 추천해 드릴수 있어요.{topic=t_answer1}{@start}
+    + e:turn-release-detected
+    - <get name1>님, 답변을 해 주셔야 제가 <get name>님께 가장 잘 맞는 제품을 추천해 드릴수 있어요.{topic=t_answer1}{@start}
 < topic
 
 > topic t_rec_items
-	+ start
-	- <call>mget skincare_item/recommended_list</call> 고객님이 선택하신 이 제품은 A사에서 제조한 것으로 피부의 멜라닌 색소를 억제해 피부노화를 방지하고.….{topic=t_item_detail}
+    + start
+    - <call>mget skincare_item/recommended_list</call> 고객님이 선택하신 이 제품은 A사에서 제조한 것으로 피부의 멜라닌 색소를 억제해 피부노화를 방지하고.….{topic=t_item_detail}
 
-	+ e:turn-take-detected
-	- 제발, 다음부터는 제가 말할 때 끼어들지 말고 끝까지 들어 주세요.{topic=t_choice}{@start}
-	- 급한일 없으면, 중간에 끼어들지 말고 끝까지 들어주시면 좋은데……{topic=t_choice}{@start}
-	- 소중한 피부를 위해 끝까지 들어주시면 좋은데……{topic=t_choice}{@start}
+    + e:turn-take-detected
+    - 제발, 다음부터는 제가 말할 때 끼어들지 말고 끝까지 들어 주세요.{topic=t_choice}{@start}
+    - 급한일 없으면, 중간에 끼어들지 말고 끝까지 들어주시면 좋은데……{topic=t_choice}{@start}
+    - 소중한 피부를 위해 끝까지 들어주시면 좋은데……{topic=t_choice}{@start}
 
 < topic
 
 > topic t_item_detail
-	+ start
-	+ 이 제품에 대한 좀 더 자세한 설명을 해 드릴까요?
+    + start
+    - 이 제품에 대한 좀 더 자세한 설명을 해 드릴까요?
 
-	+ (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-	^ 제품에 대한 자세한 설명을 해 드릴테니 잠시만 기다려주세요. {topic=t_item_pointing}
+    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
+    ^ 제품에 대한 자세한 설명을 해 드릴테니 잠시만 기다려주세요. {topic=t_item_pointing}
 
-	+ (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
-	- 설명이 충분하면 제가 추천한 제품을 이용해 보세요. {topic=t_choice}{@start}
+    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
+    - 설명이 충분하면 제가 추천한 제품을 이용해 보세요. {topic=t_choice}{@start}
 
 < topic
 
 > topic t_item_pointing
-	+ <get name1>님, 선택하신 제품에 대한 자세한 설명을 드릴께요.
-	- <pointing= objects:object_name> 이 제품은 피부노화를 억제하고.... {topic=t_choice}{@start}
+    + start
+    - <get name>님, 선택하신 제품에 대한 자세한 설명을 드릴께요.
+    - <pointing=objects:object_name> 이 제품은 피부노화를 억제하고.... {topic=t_choice}{@start}
 < topic
 
 > topic t_choice
-	+ start
-	- <get name>님, 다른제품을 추천해 드릴까요?
+    + start
+    - <get name>님, 다른제품을 추천해 드릴까요?
 
-	+ (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-	- 잘 알겠어요. 고객님께서 원하시는 다른 제품을 추천해 드릴께요.{topic=t_skin_state}{@start}
+    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
+    - 잘 알겠어요. 고객님께서 원하시는 다른 제품을 추천해 드릴께요.{topic=t_skin_state}{@start}
 
-	+ (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
-	- 예, 알겠습니다. 다음에 또 방문해 주세요. {topic=t_farewell}{@start}
+    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
+    - 예, 알겠습니다. 다음에 또 방문해 주세요. {topic=t_farewell}{@start}
 
-	+ e:turn-release-detected
-	- <get name1>님 생각이 필요하신가 보네요. 조금 더 기다릴께요.{topic=t_choice}{@start}
+    + e:turn-release-detected
+    - <get name1>님 생각이 필요하신가 보네요. 조금 더 기다릴께요.{topic=t_choice}{@start}
 < topic
 
 > topic t_farewell
-	+ start
-	- <get name1>님, 반가웠습니다.
-	+ e:person-disappeared
-	- 어, 사라지셨네요. {topic=t_scenario_start}
+    + start
+    - <get name1>님, 반가웠습니다.
+    + e:person-disappeared
+    - 어, 사라지셨네요. {topic=t_scenario_start}
 < topic
