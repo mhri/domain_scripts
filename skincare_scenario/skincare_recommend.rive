@@ -1,0 +1,18 @@
+> object select_item_type python
+    import sys
+    import rospy
+    import csv
+
+    def get_item_type(age, gender, skin_state, price_range):
+        script_path = rospy.get_param('/dialog/script_path')
+        csv_file = script_path + '/skincare_data.csv'
+
+        return "스킨, 에센스"
+
+    age = 0 if (rs.get_uservar('localuser', 'age') == '젋으') else 1
+    gender = 0 if (rs.get_uservar('localuser', 'gender') == '남성') else 1
+    skin_state = 0 if (rs.get_uservar('localuser', 'gender') == '건성') else 1
+    price_range = 1 if (rs.get_uservar('localuser', 'gender') == '비싼') else 0
+
+    return get_item_type(age, gender, skin_state, price_range)
+< object

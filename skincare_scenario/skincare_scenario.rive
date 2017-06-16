@@ -5,47 +5,84 @@
 - 방문해 주셔서 감사합니다. 피부관리에 필요한 모든 것을 상담해 드립니다.{topic=t_scenariostart}
 - 피부에 대한 상태를 말씀해 주시면 자세히 상담해 드리겠습니다.{topic=t_scenariostart}
 
++ 테스트
+- <set name=안병규><set gender=남성><set age=젋으><set skin_state=지성><set price_range=비싼>{topic=t_select_item}{@start}
+
 > topic t_scenariostart
-    + e:person-appeared
+    + 사람등장 //이벤트
     - {topic=greeting}{@start}
 < topic
 
+
 > topic greeting
     + start
-    - <sm=tag:greeting[happiness]> 우리 인사부터 할까요? 만나서 반갑습니다.....  저는 스킨케어로봇입니다........
+    - <sm=tag:greeting[happiness]> 우리 인사부터 할까요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
+    - <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
+    - <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다.
 
-    + e:face-recognized
-    - <set name=<mget face_recognition/name[face_id=<get face_id>]>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
+    + 얼굴인식 //이벤트
+    //- <set name=<call>mget face_recognition/name[face_id=<get face_id>]>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
+    - 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
+    - 방문한 적이 있으셨나요?{topic=greeting2}{@start}
 < topic
 
 > topic greeting2
     + start
-    * <get name> == undefined => 저는 기억이 없는데,... 이름을 물어봐도 될까요?.........{topic=getname}
+    * <get name> == undefined => 저는 기억이 없는데, 이름을 물어봐도 될까요? {topic=getname}
     * <get name> != undefined => <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다.{topic=t_personal1}{@start}
 < topic
 
+
 > topic getname
-    + 내 이름은 *
-    - <set name1=<star>> <star>님 반갑습니다. 다음 번에 방문하시면 제가 먼저 인사드릴께요.  {topic=t_personal}{@start}
-
-    + 내이름은 *
-    - <set name1=<star>> <star>님 반갑습니다. 기억하겠습니다.  {topic=t_personal}{@start}
-
-    + 나는 *라고 해
-    - <set name1=<star>> <star>님 반갑습니다. 기억할께요.  {topic=t_personal}{@start}
-
+    + (내 이름은 *|내이름은 *|나는 *라고 해)
+    * <star4> != None => <set name=<star4>> {topic=greeting3}{@start}
+    * <star3> != None => <set name=<star3>> {topic=greeting3}{@start}
+    * <star2> != None => <set name=<star2>> {topic=greeting3}{@start}
 < topic
+
+> topic greeting3
+    + start
+    - <get name>님 반갑습니다. 다음 번에 방문하시면 제가 먼저 인사드릴께요. {topic=t_personal}{@start}
+    - <get name>님 반갑습니다. 기억하겠습니다. {topic=t_personal}{@start}
+    - <get name>님 반갑습니다. 기억할께요. {topic=t_personal}{@start}
+< topic
+
 
 > topic t_personal
     + start
-    - 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name1>님의 외형을 좀 살펴 볼께요...........{topic=t_personal_d}{@start}
+    - 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name>님의 모습을 좀 살펴 볼께요.{topic=t_personal_d}{@start}
 < topic
 
 > topic t_personal_d
     + start
-    - 저를 잠시 보세요..........
+    - 저를 잠시 보세요.
 
-    + e:face-detected
+    + 얼굴검출 // 이벤트
+    - {topic=t_start}{@start}
+
+    + 성별인식 // 메모리 읽어오기
+    //* <call>mget person_indetification/gender[face_id]</call> == male => <set gender=남성> {@age_identify}
+    - 제가 성별을 잘 못알아보겠네요. 남성이신가요? 여성이신가요?
+
+    + (남자|남성)
+    % 제가 성별을 잘 못알아보겠네요 남성이신가요 여성이신가요
+    - <set gender=남성> 그렇군요. 알려주셔서 감사합니다. {@age_identify}
+
+    + (여자|여성)
+    % 제가 성별을 잘 못알아보겠네요 남성이신가요 여성이신가요
+    - <set gender=여성> 아! 그렇군요. 아름다우신데 못 알아봐서 죄송합니다. {@age_identify}
+
+    + age_identify // 메모리 읽어오기
+    * <call>mget person_identification/age[face_id]</call> == young => <set age=젊으> {@identify}
+    - 제가 눈이 안좋은지 연령대를 추측할수가 없네요. 연세가 어떻게 되시나요?
+
+    + #
+    //% 제가 눈이 안좋은지 연령대를 추측할수가 없네요 연세가 어떻게 되시나요
+    * <star> > 40 => <set age=나이가 있으> 외모보다 나이가 많으시네요? {@next}
+    * <star> < 40 => <set age=젋으> 역시 제 예상대로 젊으시군요? {@next}
+    - 다시 한번 말씀해주세요.
+
+    + identify
    	* <mget person_identification/hair_style[face_id=<get face_id>]> == long => 긴 머리가 아주 잘어울려요. {@next}
    	* <mget person_identification/hair_style[face_id=<get face_id>]> == short => 시원하게 짧은 머리가 아주 잘어울려요.{@next}
     * <mget person_identification/cloth_color[face_id=<get face_id>]> == red => 빨간옷이 따뜻해 보이네요.{@next}
@@ -61,74 +98,104 @@
     * <mget person_identification/cloth_color[face_id=<get face_id>]> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
     * <mget person_identification/cloth_color[face_id=<get face_id>]> == '' => 좀 더 가까이 와 주세요....{@next}
 
+
     + next
     - {topic=t_start}{@start}
 < topic
 
 > topic t_start
     + start
-    - 고객님의 정보를 확인해 보겠습니다.{topic=t_genom_explain}{@start}
+    - 고객님의 정보를 몇가지 알려주시면 제가 고객님께 알맞은 화장품을 추천해드리도록 하겠습니다. {topic=t_skin_state}{@start}
 < topic
 
-> topic t_genom_explain
-    + start
-    - <sm=tag:attention[happiness]>자! 여기를 보시고 제가 하는 말을 잘 들어보세요.
-    ^ <call>mget skincare_data/id</call> 어디 보자.... //genom db, mget으로 id를 가져옴
-    ^ 고객님의 유전자 정보를 살펴 보니 유전적으로 멜라닌 세포가 활성화 되어 있고…. {topic=t_skin_state}
-    - 전반적으로 고객님의 피부는 비타민C를 흡수하는 능력이 약하시네요.{topic=t_skin_state}
-< topic
+//> topic t_genom_explain
+//    + start
+//    - <sm=tag:attention[happiness]>자! 여기를 보시고 제가 하는 말을 잘 들어보세요.
+//    ^ <call>mget skincare_data/id</call> 어디 보자.... //genom db, mget으로 id를 가져옴
+//    ^ 고객님의 유전자 정보를 살펴 보니 유전적으로 멜라닌 세포가 활성화 되어 있고…. {topic=t_skin_state}
+//    - 전반적으로 고객님의 피부는 비타민C를 흡수하는 능력이 약하시네요.{topic=t_skin_state}
+//< topic
 
 > topic t_skin_state
-    + <get name>님의 피부는 건성 인가요?
-    - <gaze=person:<get name>> 어디 보자, 건성 인가? 지성인가?{topic=t_answer}{@start}
-< topic
-
-> topic t_answer
     + start
-    - <get name>님, 제 질문에 긍정 또는 부정의 표현을 해주시면 됩니다.
-
-    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-    - 잘 알겠어요. <call>mset skin_state/skin_res:건성,user_id:11<call> //mset skin_state
-    ^ 고객님께서 원하는 가격대가 어느 정도 인가요? {topic=t_price}{@start}
-
-    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요|틀렸어|틀려)
-    - 그 참, 소중한 피부에 관심이 없으시다니, 제가 제품 추천 해 드릴테니 한번 사용해 보세요. {topic=t_rec_items}{@start}
-
-    + e:turn-release-detected
-    - <get name1>님, 생각을 너무 오래 하시네요.{topic=t_answer}{@start}
-
+    - <get name>님의 피부 상태에 대해 말씀해 주세요. 건성인가요? {topic=t_skin_state_answer}
+    - <gaze=person:<get name>> 어디 보자, 건성 인가? 지성인가? {topic=t_skin_state_answer}
 < topic
 
-> topic t_price
-    + <get name>님, 가격대가 좀 높지만 효과가 좋은 제품을 원하시나요?
-    - <e:person_disengaged> 고객님, 저 좀 보세요. 고가의 제품을 쓰실 거 같은데 그렇죠? {topic=t_answer1}{@start}
+> topic t_skin_state_answer
+    + 건성
+    - <set skin_state=건성> 피부가 건조하시군요! {topic=t_price_range}{@start}
+
+    + 지성
+    - <set skin_state=지성> 평소 유분 관리에 신경이 쓰이시겠어요. {topic=t_price_range}{@start}
+
+    + (e:turn-release-detected|e:silency-detected)
+    - <get name1>님, 생각을 너무 오래 하시네요. 건성과 지성 중 선택해서 말씀해주세요.
+    - <get name1>님, 고민 중 이신가요? <get name>님의 피부를 한번 살펴보시고, 건성과 지성 중 어떤게 맞는지 대답해주세요.
+
+    + *
+    - 그럼, 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다. 다음으로 진행할까요?
+
+    + 그래
+    % 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
+    - 알겠습니다. {topic=t_price_range}{@start}
+
+    + 아니
+    % 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
+    - 건성과 지성 중 어떤 피부이신가요?
 < topic
 
-> topic t_answer1
+
+
+> topic t_price_range
     + start
-    - <get name>님, 맞으면 긍정의 표현을 해주시고 싫으시면 부정의 표현을 해 주세요.
-
-    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-    - 잘 알겠어요. <call>mset price/price_level:1,user_id:11<call>
-    ^ 고객님께 적당한 제품을 추천해 드릴테니 잠시만 기다려주세요. {topic=t_rec_items}{@start} //memset data
-
-    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
-    - 가격은 별로 중요하지 않으시군요. 제가 <get name>님께 적당한 제품을 추천해드릴께요. 한번 이용해 보세요. {topic=t_rec_items}{@start}
-
-    + e:turn-release-detected
-    - <get name1>님, 답변을 해 주셔야 제가 <get name>님께 가장 잘 맞는 제품을 추천해 드릴수 있어요.{topic=t_answer1}{@start}
+    - <get name>님, 가격대가 좀 높지만 효과가 확실한 제품을 원하시나요? 아니면 저렴한 제품을 원하시나요? {topic=t_price_range_answer}
 < topic
 
-> topic t_rec_items
+> topic t_price_range_answer
+    + 그래
+    - <set price_range=비싼> 선택하신 것이 후회되지 않은 좋은 제품을 알려 드릴께요. {topic=t_select_item}{@start}
+
+    + (아니|저렴*)
+    - <set price_range=저렴한> 음.. 최선을 다해 제품을 알아보겠습니다. {topic=t_select_item}{@start}
+< topic
+
+
+
+> topic t_select_item
     + start
-    - <call>mget skincare_item/recommended_list</call> 고객님이 선택하신 이 제품은 A사에서 제조한 것으로 피부의 멜라닌 색소를 억제해 피부노화를 방지하고.….{topic=t_item_detail}
+    - <delay=2> 지금까지 제가 얻은 정보를 종합해 보면, <get name>님은 <get gender>이시고, 피부 상태는 <get skin_state>, 연령은 <get age>신 것으로 되어 있습니다. \n
+    ^ 그리고, 가격은 <get price_range> 제품으로 선택하셨구요. {@start2}
 
-    + e:turn-take-detected
-    - 제발, 다음부터는 제가 말할 때 끼어들지 말고 끝까지 들어 주세요.{topic=t_choice}{@start}
-    - 급한일 없으면, 중간에 끼어들지 말고 끝까지 들어주시면 좋은데……{topic=t_choice}{@start}
-    - 소중한 피부를 위해 끝까지 들어주시면 좋은데……{topic=t_choice}{@start}
+    + start2
+    - <delay=1> 알맞는 제품을 검색 중입니다. {@start3}
 
+    + start3
+    //- <delay=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요?
+    - <delay=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요? {topic=t_detailed_item}
 < topic
+
+> topic t_detailed_item
+    + 그래
+    - 스킨, 썬크림, 에센스 중 어떤 제품을 원하시나요?
+
+    + 스킨
+    % 스킨 썬크림 에센스 중 어떤 제품을 원하시나요
+    - 스킨은 어떤어떤 제품이 있습니다. 다른 제품도 알려드릴까요?
+
+    + 썬크림
+    % 스킨 썬크림 에센스 중 어떤 제품을 원하시나요
+    - 썬크림은 어떤어떤 제품이 있습니다.
+
+    + 에센스
+    % 스킨 썬크림 에센스 중 어떤 제품을 원하시나요
+    - 에센스는 어떤어떤 제품이 있습니다.
+
+    + 고마워
+    - 네. 도움이 되셨다니 제가 기쁘네요. 감사합니다. {topic=reset}
+< topic
+
+
 
 > topic t_item_detail
     + start
