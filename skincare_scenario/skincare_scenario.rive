@@ -5,8 +5,14 @@
 - 방문해 주셔서 감사합니다. 피부관리에 필요한 모든 것을 상담해 드립니다.{topic=t_scenariostart}
 - 피부에 대한 상태를 말씀해 주시면 자세히 상담해 드리겠습니다.{topic=t_scenariostart}
 
++ 기본
+- <call>get_genom_data</call> 기본값 설정
+
 + 테스트
-- <set name=안병규><set gender=남성><set age=젋으><set skin_state=지성><set price_range=비싼>{topic=t_select_item}{@start}
+- <set name=홍길동><set gender=남성><set age=젋으><set skin_state=지성><set price_range=비싼>{topic=t_select_item}{@start}
+
++ 테스트2
+- {topic=t_start}{@start}
 
 > topic t_scenariostart
     + 사람등장 //이벤트
@@ -29,7 +35,7 @@
 > topic greeting2
     + start
     * <get name> == undefined => 저는 기억이 없는데, 이름을 물어봐도 될까요? {topic=getname}
-    * <get name> != undefined => <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다.{topic=t_personal1}{@start}
+    * <get name> != undefined => <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다.{topic=t_personal}{@start}
 < topic
 
 
@@ -98,23 +104,40 @@
     * <mget person_identification/cloth_color[face_id=<get face_id>]> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
     * <mget person_identification/cloth_color[face_id=<get face_id>]> == '' => 좀 더 가까이 와 주세요....{@next}
 
-
     + next
     - {topic=t_start}{@start}
 < topic
 
+
+
 > topic t_start
     + start
-    - 고객님의 정보를 몇가지 알려주시면 제가 고객님께 알맞은 화장품을 추천해드리도록 하겠습니다. {topic=t_skin_state}{@start}
+    - 먼저 유전자 검사 결과를 살펴보도록 하겠습니다. 잠시만요. {topic=t_genom_explain}{@start}
+    //-
 < topic
 
-//> topic t_genom_explain
-//    + start
-//    - <sm=tag:attention[happiness]>자! 여기를 보시고 제가 하는 말을 잘 들어보세요.
-//    ^ <call>mget skincare_data/id</call> 어디 보자.... //genom db, mget으로 id를 가져옴
-//    ^ 고객님의 유전자 정보를 살펴 보니 유전적으로 멜라닌 세포가 활성화 되어 있고…. {topic=t_skin_state}
-//    - 전반적으로 고객님의 피부는 비타민C를 흡수하는 능력이 약하시네요.{topic=t_skin_state}
-//< topic
+> topic t_genom_explain
+    + start
+    - <call>get_genom_data</call> 내용이 좀 긴데 말씀 드릴까요?
+
+    + 그래
+    % 먼저 유전자 검사 결과를 살펴보도록 하겠습니다 잠시만요  내용이 좀 긴데 말씀 드릴까요
+    - 고객님의 유전자 검사 결과를 살펴보겠습니다. \n
+    ^ 피부탄력을 결정하는 MMP1 유전자는 세포 속 콜라겐 함유량이 평균량 <get genom_skin> 으로 나타났습니다.\n
+    ^ 색소침착을 결정하는 OCA2, MC1R 유전자는 멜라노사이트에 의해 색소 누적이 <get genom_color> 것으로 보여집니다.\n
+    ^ 피부 노화는 콜라겐의 양을 보니 피부 재생 속도가 <get genom_old> 것으로 보입니다.\n
+    ^ 마지막으로 비타민C를 흡수하는 능력이 <get genom_vitamin> 것으로 보입니다. {@next}
+
+    + 아니
+    % 먼저 유전자 검사 결과를 살펴보도록 하겠습니다 잠시만요  내용이 좀 긴데 말씀 드릴까요
+    - {@next}
+
+    + next
+    - 자, 그럼 다음 단계로 넘어가도록 하겠습니다. 고객님의 정보를 몇가지 알려주시면 제가 고객님께 알맞은 화장품을 추천해드리도록 하겠습니다. {topic=t_skin_state}{@start}
+
+< topic
+
+
 
 > topic t_skin_state
     + start
@@ -172,66 +195,40 @@
 
     + start3
     //- <delay=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요?
-    - <delay=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요? {topic=t_detailed_item}
+    - <delay=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요? {topic=t_agree_detail_tem}
 < topic
+
+> topic t_agree_detail_tem
+    + 그래
+    - 어떤 제품으로 알려드릴까요? {topic=t_detailed_item}
+
+    + 아니
+    - 그럼 처음으로 돌아갑니다. {topic=reset}
+
+< topic
+
+
 
 > topic t_detailed_item
-    + 그래
-    - 스킨, 썬크림, 에센스 중 어떤 제품을 원하시나요?
-
     + 스킨
-    % 스킨 썬크림 에센스 중 어떤 제품을 원하시나요
-    - 스킨은 어떤어떤 제품이 있습니다. 다른 제품도 알려드릴까요?
+    * <get skin> != undefined => <call>get_description_item skin</call> {@next}
+    - 제가 추천해드린 제품 중 스킨은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + 썬크림
-    % 스킨 썬크림 에센스 중 어떤 제품을 원하시나요
-    - 썬크림은 어떤어떤 제품이 있습니다.
+    * <get suncream> != undefined => <call>get_description_item suncream</call> {@next}
+    - 제가 추천해드린 제품 중 썬크림은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + 에센스
-    % 스킨 썬크림 에센스 중 어떤 제품을 원하시나요
-    - 에센스는 어떤어떤 제품이 있습니다.
+    * <get essense> != undefined => <call>get_description_item essense</call> {@next}
+    - 제가 추천해드린 제품 중 에센스는 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
-    + 고마워
+    + 크림
+    * <get cream> != undefined => <call>get_description_item cream</call> {@next}
+    - 제가 추천해드린 제품 중 크림은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
+
+    + (고마워|이제 그만)
     - 네. 도움이 되셨다니 제가 기쁘네요. 감사합니다. {topic=reset}
-< topic
 
-
-
-> topic t_item_detail
-    + start
-    - 이 제품에 대한 좀 더 자세한 설명을 해 드릴까요?
-
-    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-    ^ 제품에 대한 자세한 설명을 해 드릴테니 잠시만 기다려주세요. {topic=t_item_pointing}
-
-    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
-    - 설명이 충분하면 제가 추천한 제품을 이용해 보세요. {topic=t_choice}{@start}
-
-< topic
-
-> topic t_item_pointing
-    + start
-    - <get name>님, 선택하신 제품에 대한 자세한 설명을 드릴께요.
-    - <pointing=objects:object_name> 이 제품은 피부노화를 억제하고.... {topic=t_choice}{@start}
-< topic
-
-> topic t_choice
-    + start
-    - <get name>님, 다른제품을 추천해 드릴까요?
-
-    + (e:intention-affirmation|그래|맞아|그렇지|그레|그런 것 *|응|네)
-    - 잘 알겠어요. 고객님께서 원하시는 다른 제품을 추천해 드릴께요.{topic=t_skin_state}{@start}
-
-    + (e:intention-negation|아니|아닌데|글쎄|잘 몰라|아니요)
-    - 예, 알겠습니다. 다음에 또 방문해 주세요. {topic=t_farewell}{@start}
-
-    + e:turn-release-detected
-    - <get name1>님 생각이 필요하신가 보네요. 조금 더 기다릴께요.{topic=t_choice}{@start}
-< topic
-
-> topic t_farewell
-    + start
-    - <get name1>님, 반가웠습니다.
-    + e:person-disappeared
-    - 어, 사라지셨네요. {topic=t_scenario_start}
+    + next
+    - <delay=2>다른 제품에 대한 정보도 알려드릴까요?
 < topic
