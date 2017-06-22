@@ -19,6 +19,12 @@
 //+ 테스트2
 //- {topic=t_start}{@start}
 
++ 메모리
+- <set face_id=<call>mget person_detection/person_id[0]</call>> <get face_id> 검출
+
++ 메모리2
+- <set name=<call>mget person_identification/gender[session_face_id:face_id]</call>> <get name> 검출
+
 > topic t_scenariostart
     //+ e:face-detected
     + (e:person-engaged|안녕)
@@ -33,14 +39,14 @@
 
 > topic greeting
     + start
-    - <br=4> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
-    - <br=4> <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
-    - <br=4> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다.
+    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
+    - <br=2> <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
+    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다.
 
     //+ e:person-engaged //이벤트
-    + (얼굴인식|e:face-recognized)
-    - <set name=<call>mget face_recognition/name[<get face_id>]>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
-    //- 어디 보자, 방문한 적이 있는지 알아볼게요. {topic=greeting2}{@start}
+    + (얼굴인식|e:face-recognized|얼굴 인식)
+    //- <set name=<call>mget face_recognition/name[session_face_id:face_id]</call>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
+    - 어디 보자, 방문한 적이 있는지 알아볼게요. {topic=greeting2}{@start}
     - 방문한 적이 있으셨나요? {topic=greeting2}{@start}
 < topic
 
@@ -68,35 +74,36 @@
 
 > topic t_personal
     + start
-    - <br=4> 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name>님의 모습을 좀 살펴 볼께요.{topic=t_personal_d}{@start}
+    - <br=2> 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name>님의 모습을 좀 살펴 볼께요.{topic=t_personal_d}{@start}
 < topic
 
 > topic t_personal_d
     + start
-    - <br=4> 저를 잠시 보세요. {@gender_detect}
+    - <br=2> 저를 잠시 보세요. {@gender_detect}
 
     + gender_detect
-    * <call>mget person_indetification/gender[<get face_id>]</call> == undefined => 제가 성별을 잘 못알아보겠네요. 남성이신가요? 여성이신가요? {topic=t_gender}
-    - <call>mget person_indetification/gender[<get face_id>]</call> != undefined => {@age_detect}
+    * <call>mget person_identification/gender[session_face_id:face_id]</call> == unknown => 제가 성별을 잘 못알아보겠네요. 남성이신가요? 여성이신가요? {topic=t_gender}
+    - <call>mget person_identification/gender[session_face_id:face_id]</call> != unknown => {@age_detect}
 
     + age_detect // 메모리 읽어오기
-    - 제가 눈이 안좋은지 연령대를 추측할수가 없네요. 연세가 어떻게 되시나요? {topic=t_age}
+    - 제가 눈이 안좋은지 연령대를 추측할수가 없네요. 연세가 어떻게 되시나요? {topic=t_ageaaa}
 
     + identify
-   	* <call>mget person_identification/hair_style[<get face_id>]</call> == long => 긴 머리가 아주 잘어울려요. {@next}
-   	* <call>mget person_identification/hair_style[<get face_id>]</call> == short => 시원하게 짧은 머리가 아주 잘어울려요.{@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == red => 빨간옷이 따뜻해 보이네요.{@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == blue => 파란색옷이 잘 어울리네요.{@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == green => 녹색옷이 상큼해 보이네요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == black => 검정색 옷이 차분해 보이네요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == purple => 보라색옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == brown => 갈색옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == grey => 회색 옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == orange => 오렌지색 옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == pink => 핑크색 옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == white => 흰 옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
-    * <call>mget person_identification/cloth_color[<get face_id>]</call> == '' => 좀 더 가까이 와 주세요....{@next}
+   	//* <call>mget person_identification/hair_style[session_face_id:face_id]</call> == long => 긴 머리가 아주 잘어울려요. {@next}
+   	//* <call>mget person_identification/hair_style[session_face_id:face_id]</call> == short => 시원하게 짧은 머리가 아주 잘어울려요.{@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == red => 빨간옷이 따뜻해 보이네요.{@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == blue => 파란색옷이 잘 어울리네요.{@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == green => 녹색옷이 상큼해 보이네요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == black => 검정색 옷이 차분해 보이네요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == purple => 보라색옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == brown => 갈색옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == grey => 회색 옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == orange => 오렌지색 옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == pink => 핑크색 옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == white => 흰 옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
+    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == '' => 좀 더 가까이 와 주세요....{@next}
+    - 스타일이 괜찮으시네요. {@next}
 
     + next
     - {topic=t_start}{@start}
@@ -110,7 +117,7 @@
     - <set gender=여성> 아! 그렇군요. 아름다우신데 못 알아봐서 죄송합니다. {topic=t_personal_d}{@age_detect}
 < topic
 
-> topic t_age
+> topic t_ageaaa
     + #
     * <star> > 40 => <set age=나이가 있으> 외모보다 나이가 많으시네요? {topic=t_personal_d}{@identify}
     * <star> < 40 => <set age=젋으> 역시 제 예상대로 젊으시군요? {topic=t_personal_d}{@identify}
@@ -137,7 +144,7 @@
     ^ 피부탄력을 결정하는 MMP1 유전자는 세포 속 콜라겐 함유량이 평균량 <get genom_skin> 으로 나타났습니다.\n
     ^ 색소침착을 결정하는 OCA2, MC1R 유전자는 멜라노사이트에 의해 색소 누적이 <get genom_color> 것으로 보여집니다.\n
     ^ 피부 노화는 콜라겐의 양을 보니 피부 재생 속도가 <get genom_old> 것으로 보입니다.\n
-    ^ 마지막으로 비타민C를 흡수하는 능력이 <get genom_vitamin> 것으로 보입니다. {@next}        
+    ^ 마지막으로 비타민C를 흡수하는 능력이 <get genom_vitamin> 것으로 보입니다. {@next}
 
     + 아니
     - {@next}
@@ -165,16 +172,16 @@
     - <get name>님, 생각을 너무 오래 하시네요. 건성과 지성 중 선택해서 말씀해주세요.
     - <get name>님, 고민 중 이신가요? <get name>님의 피부를 한번 살펴보시고, 건성과 지성 중 어떤게 맞는지 대답해주세요.
 
-    + *
-    - 그럼, 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다. 다음으로 진행할까요?
+    //+ *
+    //- 그럼, 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다. 다음으로 진행할까요?
 
-    + 그래
-    % 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
-    - 알겠습니다. {topic=t_price_range}{@start}
+    //+ 그래
+    //% 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
+    //- 알겠습니다. {topic=t_price_range}{@start}
 
-    + 아니
-    % 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
-    - 건성과 지성 중 어떤 피부이신가요?
+    //+ 아니
+    //% 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
+    //- 건성과 지성 중 어떤 피부이신가요?
 < topic
 
 
@@ -233,7 +240,7 @@
     * <get cream> != undefined => <call>get_description_item cream</call> {@next}
     - 제가 추천해드린 제품 중 크림은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
-    + (싫어|그만|됐어)
+    + (싫어|그만|됐어|아니|싫 어)
     - 네. 도움이 되셨다니 제가 기쁘네요. 감사합니다. {topic=reset}
 
     + next
