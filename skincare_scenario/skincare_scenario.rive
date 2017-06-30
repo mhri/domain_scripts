@@ -4,26 +4,19 @@
 //+ 안녕
 - 피부에 대한 고민이 있거나 상담이 필요하시면 가까이 오세요. 제가 도와 드릴께요.{topic=t_scenariostart}
 - 방문해 주셔서 감사합니다. 피부관리에 필요한 모든 것을 상담해 드립니다.{topic=t_scenariostart}
-//- 피부에 대한 상태를 말씀해 주시면 자세히 상담해 드리겠습니다.{topic=t_scenariostart}
+- 피부에 대한 상태를 말씀해 주시면 자세히 상담해 드리겠습니다.{topic=t_scenariostart}
 
-+ 가르키기
-- <pointing=objects:Box1><gaze=objects:Box1> 박스1의 위치는 여기입니다.
-- <pointing=objects:Box2><gaze=objects:Box2> 박스2의 위치는 여기입니다.
 
-//+ 기본
-//- <call>get_genom_data</call> 기본값 설정
+> topic exception_person_disappeared
+    + e:person-disappeared
+    - <overriding=2> 제 앞에서 벗어나셨군요. 다음에 다시 와주세요. {topic=reset}
+< topic
 
-//+ 테스트
-//- <set name=홍길동><set gender=남성><set age=젋으><set skin_state=지성><set price_range=비싼>{topic=t_select_item}{@start}
-
-//+ 테스트2
-//- {topic=t_start}{@start}
-
-+ 메모리
-- <set face_id=<call>mget person_detection/person_id[0]</call>> <get face_id> 검출
-
-+ 메모리2
-- <set name=<call>mget person_identification/gender[session_face_id:face_id]</call>> <get name> 검출
+> topic exception_person_disengaged
+    + e:person-disengaged
+    - 상담이 지루하시더라도 집중해 주시면 감사하겠습니다.
+    - 노잼이어도 알아두시면 괜찮은 정보입니다. 집중해주세요.
+< topic
 
 > topic t_scenariostart
     //+ e:face-detected
@@ -39,21 +32,26 @@
 
 > topic greeting
     + start
-    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
-    - <br=2> <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다.
-    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다.
+    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. {@next}
+    - <br=2> <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다. {@next}
+    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다. {@next}
 
     //+ e:person-engaged //이벤트
-    + (얼굴인식|e:face-recognized|얼굴 인식)
+    + next
     //- <set name=<call>mget face_recognition/name[session_face_id:face_id]</call>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
-    - 어디 보자, 방문한 적이 있는지 알아볼게요. {topic=greeting2}{@start}
-    - 방문한 적이 있으셨나요? {topic=greeting2}{@start}
+    - 어디 보자, 방문한 적이 있는지 알아볼게요. {topic=getname_first}{@start}
+    - 방문한 적이 있으셨나요? {topic=getname_first}{@start}
+< topic
+
+> topic getname_first
+    + start
+    - <set name=<call>mget person_identification/name[session_face_id:face_id]</call>> {topic=greeting2}{@start}
 < topic
 
 > topic greeting2
     + start
-    * <get name> == undefined => <br=2> 저는 기억이 없는데, 이름을 물어봐도 될까요? {topic=getname}
-    * <get name> != undefined => <br=2> <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다.{topic=t_personal}{@start}
+    * <get name> == undefined => <br=2> 저는 기억이 없는데, 이름을 물어봐도 될까요? <set first_visit=1> {topic=getname}
+    * <get name> != undefined => <br=2> <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다. <set first_visit=0> {topic=t_personal}{@start}
 < topic
 
 
@@ -83,25 +81,28 @@
 
     + gender_detect
     * <call>mget person_identification/gender[session_face_id:face_id]</call> == unknown => 제가 성별을 잘 못알아보겠네요. 남성이신가요? 여성이신가요? {topic=t_gender}
-    - <call>mget person_identification/gender[session_face_id:face_id]</call> != unknown => {@age_detect}
+    * <call>mget person_identification/gender[session_face_id:face_id]</call> == male => 멋진 남성분이시군요. <set gender=남성> {@age_detect}
+    * <call>mget person_identification/gender[session_face_id:face_id]</call> == female => 아름다운 여성분이시군요. <set gender=여성> {@age_detect}
 
     + age_detect // 메모리 읽어오기
+    * <call>mget person_identification/age[session_face_id:face_id]</call> >= 40 => 40세보다 많으십니다. <set age=나이가 있으> {@identify}
+    * <call>mget person_identification/age[session_face_id:face_id]</call> < 40 => 40세보다 적으십니다. <set age=젋으> {@identify}
     - 제가 눈이 안좋은지 연령대를 추측할수가 없네요. 연세가 어떻게 되시나요? {topic=t_ageaaa}
 
     + identify
    	//* <call>mget person_identification/hair_style[session_face_id:face_id]</call> == long => 긴 머리가 아주 잘어울려요. {@next}
    	//* <call>mget person_identification/hair_style[session_face_id:face_id]</call> == short => 시원하게 짧은 머리가 아주 잘어울려요.{@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == red => 빨간옷이 따뜻해 보이네요.{@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == blue => 파란색옷이 잘 어울리네요.{@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == green => 녹색옷이 상큼해 보이네요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == black => 검정색 옷이 차분해 보이네요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == purple => 보라색옷이 아주 멋있어 보여요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == brown => 갈색옷이 아주 멋있어 보여요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == grey => 회색 옷이 아주 멋있어 보여요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == orange => 오렌지색 옷이 아주 멋있어 보여요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == pink => 핑크색 옷이 아주 멋있어 보여요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == white => 흰 옷이 아주 멋있어 보여요. {@next}
-    //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == yellow => 노란색옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Red => 빨간옷이 따뜻해 보이네요.{@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Blue => 파란색옷이 잘 어울리네요.{@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Green => 녹색옷이 상큼해 보이네요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Black => 검정색 옷이 차분해 보이네요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Purple => 보라색옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Brown => 갈색옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Gray => 회색 옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Orange => 오렌지색 옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Pink => 핑크색 옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == White => 흰 옷이 아주 멋있어 보여요. {@next}
+    * <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == Yellow => 노란색옷이 아주 멋있어 보여요. {@next}
     //* <call>mget person_identification/cloth_color[session_face_id:face_id]</call> == '' => 좀 더 가까이 와 주세요....{@next}
     - 스타일이 괜찮으시네요. {@next}
 
@@ -109,7 +110,7 @@
     - {topic=t_start}{@start}
 < topic
 
-> topic t_gender
+> topic t_gender inherits exception_person_disengaged exception_person_disappeared
     + (남자|남성)
     - <set gender=남성> 그렇군요. 알려주셔서 감사합니다. {topic=t_personal_d}{@age_detect}
 
@@ -117,18 +118,17 @@
     - <set gender=여성> 아! 그렇군요. 아름다우신데 못 알아봐서 죄송합니다. {topic=t_personal_d}{@age_detect}
 < topic
 
-> topic t_ageaaa
+> topic t_ageaaa inherits exception_person_disengaged exception_person_disappeared
     + #
     * <star> > 40 => <set age=나이가 있으> 외모보다 나이가 많으시네요? {topic=t_personal_d}{@identify}
     * <star> < 40 => <set age=젋으> 역시 제 예상대로 젊으시군요? {topic=t_personal_d}{@identify}
     - 다시 한번 말씀해주세요.
 < topic
 
-
-
 > topic t_start
     + start
-    - <br=5> 먼저 유전자 검사 결과를 살펴보도록 하겠습니다. 잠시만요. {topic=t_genom_explain}{@start}
+    * <get first_visit> == 0 => <br=5> 먼저 유전자 검사 결과를 살펴보도록 하겠습니다. 잠시만요. {topic=t_genom_explain}{@start}
+    * <get first_visit> == 1 => <br=5> 유전자 검사를 먼저 받으셔야 자세한 상담이 가능합니다.  {topic=reset}
     //-
 < topic
 
@@ -138,7 +138,7 @@
 
 < topic
 
-> topic t_genom
+> topic t_genom inherits exception_person_disengaged exception_person_disappeared
     + 그래
     - 고객님의 유전자 검사 결과를 살펴보겠습니다. \n
     ^ 피부탄력을 결정하는 MMP1 유전자는 세포 속 콜라겐 함유량이 평균량 <get genom_skin> 으로 나타났습니다.\n
@@ -161,7 +161,7 @@
     - <gaze=person:<get face_id>> 어디 보자, 건성인가? 지성인가? {topic=t_skin_state_answer}
 < topic
 
-> topic t_skin_state_answer
+> topic t_skin_state_answer inherits exception_person_disengaged exception_person_disappeared
     + 건성
     - <set skin_state=건성> 피부가 건조하시군요! {topic=t_price_range}{@start}
 
@@ -191,7 +191,7 @@
     - <get name>님, 가격대가 좀 높지만 효과가 확실한 제품을 원하시나요? {topic=t_price_range_answer}
 < topic
 
-> topic t_price_range_answer
+> topic t_price_range_answer inherits exception_person_disengaged exception_person_disappeared
     + 그래
     - <set price_range=비싼> 선택하신 것이 후회되지 않은 좋은 제품을 알려 드릴께요. {topic=t_select_item}{@start}
 
@@ -214,7 +214,7 @@
     - <br=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요? {topic=t_agree_detail_tem}
 < topic
 
-> topic t_agree_detail_tem
+> topic t_agree_detail_tem inherits exception_person_disengaged exception_person_disappeared
     + 그래
     - 어떤 제품으로 알려드릴까요? {topic=t_detailed_item}
 
@@ -223,21 +223,21 @@
 < topic
 
 
-> topic t_detailed_item
+> topic t_detailed_item inherits exception_person_disengaged exception_person_disappeared
     + 스킨
-    * <get skin> != undefined => <call>get_description_item skin</call> {@next}
+    * <get skin> != undefined => <gaze=objects:Box1><pointing=objects:Box1> 스킨 제품은 이쪽에 있습니다. <call>get_description_item skin</call> {@next}
     - 제가 추천해드린 제품 중 스킨은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + 썬크림
-    * <get suncream> != undefined => <call>get_description_item suncream</call> {@next}
+    * <get suncream> != undefined => <gaze=objects:Box1><pointing=objects:Box2> 썬크림 제품은 이쪽을 보세요. <call>get_description_item suncream</call> {@next}
     - 제가 추천해드린 제품 중 썬크림은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + 에센스
-    * <get essense> != undefined => <call>get_description_item essense</call> {@next}
+    * <get essense> != undefined => <gaze=objects:Box1><pointing=objects:Box1> 에센스는 이쪽에 모여져 있습니다. <call>get_description_item essense</call> {@next}
     - 제가 추천해드린 제품 중 에센스는 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + 크림
-    * <get cream> != undefined => <call>get_description_item cream</call> {@next}
+    * <get cream> != undefined => <gaze=objects:Box1><pointing=objects:Box1> 크림은 이쪽을 보세요. <call>get_description_item cream</call> {@next}
     - 제가 추천해드린 제품 중 크림은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + (싫어|그만|됐어|아니|싫 어)
