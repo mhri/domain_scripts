@@ -110,41 +110,10 @@
     return get_item_type(age, gender, skin_state, price_range, genom_skin, genom_color, genom_old, genom_vitamin)
 < object
 
-
-> object get_genom_data python
-    # 유전자 정보 랜덤 선택
-    import sys
-    import rospy
-    import csv
-    import random
-
-    def get_random_genom():
-        script_path = rospy.get_param('/dialog/script_path')
-        csv_file = script_path + '/skincare_data.csv'
-
-        with open(csv_file, 'r') as data_file:
-            csv_data = csv.reader(data_file)
-            row_title = csv_data.next()
-
-            row_data = []
-            for row in csv_data:
-                row_data.append(row[1:])
-
-            select_genom = row_data[random.randint(0, len(row_data)-1)]
-
-            rs.set_uservar('localuser', 'genom_skin', ['보다 적은', '과 같은', '많은 것'][int(select_genom[0])-1])
-            rs.set_uservar('localuser', 'genom_color', ['적은', '적당한', '많은'][int(select_genom[1])-1])
-            rs.set_uservar('localuser', 'genom_old', ['적은', '적당한', '많은'][int(select_genom[2])-1])
-            rs.set_uservar('localuser', 'genom_vitamin', ['나쁜', '적당한', '괜찮은'][int(select_genom[3])-1])
-        return
-
-    return get_random_genom()
-< object
-
 > object get_description_item python
     # item_list = unicode(args[0], 'utf-8')
     item_list = rs.get_uservar('localuser', args[0])
-    print(item_list)
+    # print(item_list)
 
     item_list = item_list.split(',')
     if len(item_list) == 1:
@@ -177,4 +146,40 @@
         ret_str += u'%s 제품이 있습니다.'%(item)
 
     return ret_str
+< object
+
+> object get_genom_data python
+    # 유전자 정보 랜덤 선택
+    import sys
+    import rospy
+    import csv
+    import random
+    #
+    arg_value = rs.get_uservar('localuser', 'name')
+
+    script_path = rospy.get_param('/dialog/script_path')
+    csv_file = script_path + '/skincare_data.csv'
+
+    with open(csv_file, 'r') as data_file:
+        csv_data = csv.reader(data_file)
+        row_title = next(csv_data)
+
+        name_index = row_title.index('이름'.encode('utf-8'))
+        row_data = []
+        for row in csv_data:
+            # print(arg_value.encode('utf-8'))
+            if row[name_index] == arg_value.encode('utf-8'):
+                row_data.append(row[1:])
+
+        if len(row_data) == 0:
+            return 'undefined'
+
+        select_genom = row_data[0]
+
+        rs.set_uservar('localuser', 'genom_skin', ['보다 적은', '과 같은', '많은 것'][int(select_genom[0])-1])
+        rs.set_uservar('localuser', 'genom_color', ['적은', '적당한', '많은'][int(select_genom[1])-1])
+        rs.set_uservar('localuser', 'genom_old', ['적은', '적당한', '많은'][int(select_genom[2])-1])
+        rs.set_uservar('localuser', 'genom_vitamin', ['나쁜', '적당한', '괜찮은'][int(select_genom[3])-1])
+
+    return 'true'
 < object

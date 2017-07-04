@@ -1,25 +1,27 @@
 ! version = 2.0
 
 + e:person-appeared
-//+ 안녕
 - 피부에 대한 고민이 있거나 상담이 필요하시면 가까이 오세요. 제가 도와 드릴께요.{topic=t_scenariostart}
 - 방문해 주셔서 감사합니다. 피부관리에 필요한 모든 것을 상담해 드립니다.{topic=t_scenariostart}
 - 피부에 대한 상태를 말씀해 주시면 자세히 상담해 드리겠습니다.{topic=t_scenariostart}
 
-
 > topic exception_person_disappeared
     + e:person-disappeared
-    - <overriding=2> 제 앞에서 벗어나셨군요. 다음에 다시 와주세요. {topic=reset}
+    - <overriding=2> 제 앞에서 벗어나셨군요. 다음에 다시 와주세요. {topic=t_reset_variable}{@start}
+    - <overriding=2> 안녕히 가세요. 다음에도 꼭 다시 찾아주세요. {topic=t_reset_variable}{@start}
+    - <overriding=2> 안녕히 가세요. {topic=t_reset_variable}{@start}
+    - <overriding=2> 다음에도 도와드릴께요! {topic=t_reset_variable}{@start}
 < topic
 
 > topic exception_person_disengaged
     + e:person-disengaged
-    - 상담이 지루하시더라도 집중해 주시면 감사하겠습니다.
-    - 노잼이어도 알아두시면 괜찮은 정보입니다. 집중해주세요.
+    - <overriding=1> 상담이 지루하시더라도 집중해 주시면 감사하겠습니다.
+    - <overriding=1> 노잼이어도 알아두시면 괜찮은 정보입니다. 집중해주세요.
+    - <overriding=1> 우리 서로 얼굴을 보고 얘기하면 좋을 것 같아요.
+    - <overriding=1> 제 얼굴을 봐주시면 안될까요?
 < topic
 
-> topic t_scenariostart
-    //+ e:face-detected
+> topic t_scenariostart inherits exception_person_disappeared exception_person_disengaged
     + (e:person-engaged|안녕)
     - {topic=getperson}{@start}
 < topic
@@ -29,28 +31,36 @@
     - <set face_id=<call>mget person_detection/person_id[0]</call>> {topic=greeting}{@start}
 < topic
 
-
 > topic greeting
     + start
-    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. {@next}
-    - <br=2> <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다. {@next}
-    - <br=2> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다. {@next}
+    - <br=1> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. {@next}
+    - <br=1> <sm=tag:greeting[happiness]> 안녕하세요? 만나서 반갑습니다. 저는 스킨케어 로봇입니다. {@next}
+    - <br=1> <sm=tag:greeting[happiness]> 만나서 반갑습니다. 저는 스킨케어 로봇입니다. 고객님에게 적합한 제품을 추천해드립니다. {@next}
+    - <br=1> <sm=tag:greeting[happiness]> 안녕하세요? 저는 스킨케어 로봇입니다. {@next}
 
-    //+ e:person-engaged //이벤트
     + next
-    //- <set name=<call>mget face_recognition/name[session_face_id:face_id]</call>> 어디 보자, 방문한 적이 있는지 알아볼게요.{topic=greeting2}{@start}
-    - 어디 보자, 방문한 적이 있는지 알아볼게요. {topic=getname_first}{@start}
-    - 방문한 적이 있으셨나요? {topic=getname_first}{@start}
+    - <br=0> 어디 보자, 방문한 적이 있는지 알아볼게요. {topic=getname_first}{@start}
+    - <br=0> 고객님의 얼굴을 인식 중입니다. 잠시만요. {topic=getname_first}{@start}
+    - <br=0> 제 기억속에서 당신을 찾고 있어요. 잠시만요. {topic=getname_first}{@start}
 < topic
+
 
 > topic getname_first
     + start
-    - <set name=<call>mget person_identification/name[session_face_id:face_id]</call>> {topic=greeting2}{@start}
+    - <call>mget person_identification/name[session_face_id:face_id]</call> 인식 과정이 완료되었습니다. 다음으로 진행해도 될까요? {topic=greeting3}
+    - <call>mget person_identification/name[session_face_id:face_id]</call> 인식 과정이 완료되었습니다. 다음 단계로 진행할까요?? {topic=greeting3}
+< topic
+
+> topic greeting3 inherits exception_person_disappeared exception_person_disengaged
+    + (좋아|그래|응|알았어)
+    - {topic=greeting2}{@start}
 < topic
 
 > topic greeting2
     + start
     * <get name> == undefined => <br=2> 저는 기억이 없는데, 이름을 물어봐도 될까요? <set first_visit=1> {topic=getname}
+    * <get name> == undefined => <br=2> 처음 오셨나봐요. 이름을 말해주실래요? <set first_visit=1> {topic=getname}
+    * <get name> == undefined => <br=2> 처음 오셨군요. 제게 이름을 알려주시겠어요? <set first_visit=1> {topic=getname}
     * <get name> != undefined => <br=2> <get name>님, 지난 번에 오신적이 있네요. 다시 방문해 주셔서 감사합니다. <set first_visit=0> {topic=t_personal}{@start}
 < topic
 
@@ -60,19 +70,94 @@
     * <star4> != None => <set name=<star4>> {topic=greeting3}{@start}
     * <star3> != None => <set name=<star3>> {topic=greeting3}{@start}
     * <star2> != None => <set name=<star2>> {topic=greeting3}{@start}
+    - 다시 한번 말씀해주세요.
 < topic
 
 > topic greeting3
     + start
-    - <get name>님 반갑습니다. 다음 번에 방문하시면 제가 먼저 인사드릴께요. {topic=t_personal}{@start}
-    - <get name>님 반갑습니다. 기억하겠습니다. {topic=t_personal}{@start}
-    - <get name>님 반갑습니다. 기억할께요. {topic=t_personal}{@start}
+    - <get name>님 반갑습니다. 다음 번에 방문하시면 제가 먼저 인사드릴께요. {topic=t_unknown_personal}{@start}
+    - <get name>님 반갑습니다. 새로운 만남은 언제나 행복한 일이에요. {topic=t_unknown_personal}{@start}
+    - <get name>님 반갑습니다. 기억하겠습니다. {topic=t_unknown_personal}{@start}
+    - <get name>님 반갑습니다. 기억할께요. {topic=t_unknown_personal}{@start}
+< topic
+
+> topic t_unknown_personal
+    + start
+    * <call>mget person_identification/gender[session_face_id:face_id]</call> == unknown => <br=1>제가 성별을 잘 못알아보겠네요. 남성이신가요? 여성이신가요? {topic=t_unknown_gender}
+    * <call>mget person_identification/gender[session_face_id:face_id]</call> == male => <br=1>멋진 남성분이시군요. <set gender=남성> {@age_detect}
+    * <call>mget person_identification/gender[session_face_id:face_id]</call> == female => <br=1>아름다운 여성분이시군요. <set gender=여성> {@age_detect}
+
+    + age_detect
+    * <call>mget person_identification/age[session_face_id:face_id]</call> >= 40 => 제가 보기엔 40세보다 많으신 것 같은데 맞나요? {topic=t_unknown_check_age1}
+    * <call>mget person_identification/age[session_face_id:face_id]</call> < 40 => 제가 보기엔 40세보다 적으신 것 같은데 맞나요? {topic=t_unknown_check_age2}
+    - 제가 눈이 안좋은지 연령대를 추측할수가 없네요. 연세가 어떻게 되시나요? {topic=t_unknown_ageaaa}
+< topic
+
+> topic t_unknown_gender inherits exception_person_disengaged exception_person_disappeared
+    + (남자|남성)
+    - <set gender=남성> 그렇군요. 알려주셔서 감사합니다. {topic=t_unknown_personal}{@age_detect}
+
+    + (여자|여성)
+    - <set gender=여성> 아! 그렇군요. 아름다우신데 못 알아봐서 죄송합니다. {topic=t_unknown_personal}{@age_detect}
+< topic
+
+> topic t_unknown_check_age1 inherits exception_person_disengaged exception_person_disappeared
+    + (맞아|그래|응)
+    - 역시 제 인식 성능이 괜찮군요. <set age=나이가 있으> {@next}
+    - 역시 제 눈이 정확하군요. <set age=나이가 있으> {@next}
+
+    + (아니|아냐|틀렸어|땡)
+    - 죄송합니다. 옆에 계신 개발자를 원망하세요. <set age=젋으> {@next}
+    - 제 카메라에 뭔가 뭍었나보네요. <set age=젋으> {@next}
+    - 아닌 것 같은데, 노안이시군요. <set age=젋으> {@next}
+
+    + next
+    - {topic=t_unknown_want_product}{@start}
+< topic
+
+> topic t_unknown_check_age2 inherits exception_person_disengaged exception_person_disappeared
+    + (맞아|그래|응)
+    - 역시 제 인식 성능이 괜찮군요. <set age=젋으> {@next}
+    - 역시 제 눈이 정확하군요. <set age=젋으> {@next}
+
+    + (아니|아냐|틀렸어|땡)
+    - 와우! 보이는 것보다 동안이시군요. <set age=나이가 있으> {@next}
+    - 제 인식기가 좀 나이가 적게 나오긴 해요. <set age=나이가 있으> {@next}
+
+    + next
+    - {topic=t_unknown_want_product}{@start}
+< topic
+
+> topic t_unknown_ageaaa inherits exception_person_disengaged exception_person_disappeared
+    + #
+    * <star> > 40 => <set age=나이가 있으> 외모보다 나이가 많으시네요? {topic=t_unknown_want_product}{@start}
+    * <star> < 40 => <set age=젋으> 역시 제 예상대로 젊으시군요? {topic=t_unknown_want_product}{@start}
+    - 다시 한번 말씀해주세요.
 < topic
 
 
+> topic t_unknown_want_product
+    + start
+    - 원하시는 제품이 있으신가요? 스킨, 에센스, 크림, 썬크림 중 고르세요. {topic=t_unknown_want_product2}
+< topic
+
+> topic t_unknown_want_product2 inherits exception_person_disengaged exception_person_disappeared
+    + 에센스
+    - <set product_type=에센스> 에센스 제품을 선택하셨습니다. {topic=t_skin_state}{@start}
+
+    + 크림
+    - <set product_type=크림> 크림 제품을 선택하셨습니다. {topic=t_skin_state}{@start}
+
+    + 스킨
+    - <set product_type=스킨> 스킨 제품을 선택하셨습니다. {topic=t_skin_state}{@start}
+
+    + 썬크림
+    - <set product_type=썬크림> 썬크림 제품을 선택하셨습니다. {topic=t_skin_state}{@start}
+< topic
+
 > topic t_personal
     + start
-    - <br=2> 피부와 상관은 없지만, 상담을 시작하기 전에 제가 <get name>님의 모습을 좀 살펴 볼께요.{topic=t_personal_d}{@start}
+    - <br=2> {random}피부와 상관은 없지만,|제가 가진 인식 알고리즘을 이용해서,{/random} 상담을 시작하기 전에 제가 <get name>님의 모습을 좀 살펴 볼께요.{topic=t_personal_d}{@start}
 < topic
 
 > topic t_personal_d
@@ -127,19 +212,18 @@
 
 > topic t_start
     + start
-    * <get first_visit> == 0 => <br=5> 먼저 유전자 검사 결과를 살펴보도록 하겠습니다. 잠시만요. {topic=t_genom_explain}{@start}
-    * <get first_visit> == 1 => <br=5> 유전자 검사를 먼저 받으셔야 자세한 상담이 가능합니다.  {topic=reset}
-    //-
+    - <br=3> {random}먼저 유전자 검사 결과를 살펴보도록 하겠습니다. 잠시만요.|먼저 고객님의 유전자 검사 결과가 있는지 확인할께요.{/random} {topic=t_genom_explain}{@start}
 < topic
 
 > topic t_genom_explain
     + start
-    - <call>get_genom_data</call> <br=2> 내용이 좀 긴데 말씀 드릴까요? {topic=t_genom}
+    * <call>get_genom_data</call> == true => <br=2> 내용이 좀 긴데 말씀 드릴까요? <set have_genom_data=1> {topic=t_genom}
+    * <call>get_genom_data</call> == undefined => <br=2> {random}유전자 검사 결과가 존재하지 않습니다.|아직 유전자 검사를 받지 않으셨군요.{/random} <set have_genom_data=0> {topic=t_unknown_want_product}{@start}
 
 < topic
 
 > topic t_genom inherits exception_person_disengaged exception_person_disappeared
-    + 그래
+    + (좋아|그래|응|알았어)
     - 고객님의 유전자 검사 결과를 살펴보겠습니다. \n
     ^ 피부탄력을 결정하는 MMP1 유전자는 세포 속 콜라겐 함유량이 평균량 <get genom_skin> 으로 나타났습니다.\n
     ^ 색소침착을 결정하는 OCA2, MC1R 유전자는 멜라노사이트에 의해 색소 누적이 <get genom_color> 것으로 보여집니다.\n
@@ -158,7 +242,8 @@
 > topic t_skin_state
     + start
     - <get name>님의 피부 상태에 대해 말씀해 주세요. 건성, 지성 중 어떤 피부이신가요? {topic=t_skin_state_answer}
-    - <gaze=person:<get face_id>> 어디 보자, 건성인가? 지성인가? {topic=t_skin_state_answer}
+    - <gaze=person:<get face_id>> <get name>님의 피부 상태에 대해 말씀해 주세요. 어디 보자, 건성인가? 지성인가? {topic=t_skin_state_answer}
+    - <gaze=person:<get face_id>> <get name>님의 피부 상태에 대해 알려주세요. 건성이신가요, 아니면 지성이신가요? {topic=t_skin_state_answer}
 < topic
 
 > topic t_skin_state_answer inherits exception_person_disengaged exception_person_disappeared
@@ -171,20 +256,7 @@
     + (e:turn-release-detected|e:silency-detected)
     - <get name>님, 생각을 너무 오래 하시네요. 건성과 지성 중 선택해서 말씀해주세요.
     - <get name>님, 고민 중 이신가요? <get name>님의 피부를 한번 살펴보시고, 건성과 지성 중 어떤게 맞는지 대답해주세요.
-
-    //+ *
-    //- 그럼, 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다. 다음으로 진행할까요?
-
-    //+ 그래
-    //% 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
-    //- 알겠습니다. {topic=t_price_range}{@start}
-
-    //+ 아니
-    //% 그럼 대부분의 사람들이 지성이니 그렇게 알도록 하겠습니다 다음으로 진행할까요
-    //- 건성과 지성 중 어떤 피부이신가요?
 < topic
-
-
 
 > topic t_price_range
     + start
@@ -192,14 +264,13 @@
 < topic
 
 > topic t_price_range_answer inherits exception_person_disengaged exception_person_disappeared
-    + 그래
+    + (그래|좋아|응|알았어)
     - <set price_range=비싼> 선택하신 것이 후회되지 않은 좋은 제품을 알려 드릴께요. {topic=t_select_item}{@start}
 
-    + (아니|저렴*)
+    + (싫어|아니|저렴*|싼*)
     - <set price_range=저렴한> 음.. 최선을 다해 제품을 알아보겠습니다. {topic=t_select_item}{@start}
+    - <set price_range=저렴한> 알겠습니다. {topic=t_select_item}{@start}
 < topic
-
-
 
 > topic t_select_item
     + start
@@ -208,10 +279,16 @@
 
     + start2
     - <br=2> 알맞는 제품을 검색 중입니다. {@start3}
+    - <br=2> 고객님만의 제품을 찾고 있습니다. 잠시만요. {@start3}
 
     + start3
     //- <delay=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요?
-    - <br=5> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요? {topic=t_agree_detail_tem}
+    * <get first_visit> == 0 => {@next}
+    * <get first_visit> == 1 => <get product_type> 제품을 추천해 드리겠습니다. {topic=t_detailed_item2}{@start}
+
+    + next
+    * <get have_genom_data> == 1 => <br=3> 검색이 완료되었습니다. <get name>님께는 <call>select_item_type</call>을 추천해 드립니다. 좀더 자세히 알려드릴까요? {topic=t_agree_detail_tem}
+    * <get have_genom_data> == 0 => <get product_type> 제품을 추천해 드리겠습니다. {topic=t_detailed_item2}{@start}
 < topic
 
 > topic t_agree_detail_tem inherits exception_person_disengaged exception_person_disappeared
@@ -219,7 +296,7 @@
     - 어떤 제품으로 알려드릴까요? {topic=t_detailed_item}
 
     + 아니
-    - 그럼 처음으로 돌아갑니다. {topic=reset}
+    - 그럼 처음으로 돌아갑니다. {topic=t_reset_variable}{@start}
 < topic
 
 
@@ -241,8 +318,26 @@
     - 제가 추천해드린 제품 중 크림은 해당사항이 없습니다. 추천된 제품 중 하나를 말씀해주세요.
 
     + (싫어|그만|됐어|아니|싫 어)
-    - 네. 도움이 되셨다니 제가 기쁘네요. 감사합니다. {topic=reset}
+    - 네. 도움이 되셨다니 제가 기쁘네요. 감사합니다. {topic=t_reset_variable}{@start}
 
     + next
     - <br=2>다른 제품에 대한 정보도 알려드릴까요?
+< topic
+
+> topic t_detailed_item2
+    + start
+    * <get product_type> == 스킨 => {random}테라젠이텍스사의 진스타일 진 리쥬브네이팅 스킨 토너|에스티로더사의 에스티로더 옵티마이저{/random}가 좋을 것 같네요. {@next}
+    * <get product_type> == 썬크림 => {random}소스킨사의 소스킨 선 50 크림|소스킨사의 소스킨 선 스틱{/random}이 잘 나갑니다. {@next}
+    * <get product_type> == 에센스 => {random}설화수사의 설화수 본윤 에센스가|코리아나사의 코리아나 라비다 옴므 멀티 솔루션이{/random} 괜찮습니다. {@next}
+    * <get product_type> == 크림 => {random}더샘사의 스노우 미라클 크림|비욘드사의 비욘드 히말라야 맑은 크림{/random}이 요즘 인기 상품입니다. {@next}
+
+    + next
+    - 유전자 검사를 받으시면 좀더 자세한 상담과 제품 추천이 가능합니다. 검사에 대해서는 다른 직원분에게 문의해 주세요. 감사합니다. {topic=t_reset_variable}{@start}
+    - 지금 유전자 검사를 받으시면 좀더 자세한 상담과 제품 추천을 해드릴께요. 유전자 검사는 다른 직원분에게 문의해 주세요. 감사합니다. {topic=t_reset_variable}{@start}
+< topic
+
+
+> topic t_reset_variable
+    + start
+    - <set name=undefined> <set first_visit=0> <set have_genom_data=0> <set gender=undefined>  {topic=reset}
 < topic
