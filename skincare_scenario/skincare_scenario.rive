@@ -28,7 +28,7 @@
 
 > topic getperson
     + start
-    - <set face_id=<call>mget person_detection/person_id[0]</call>> {topic=greeting}{@start}
+    - <call>mget person_detection/person_id[0] face_id</call> {topic=greeting}{@start}
 < topic
 
 > topic greeting
